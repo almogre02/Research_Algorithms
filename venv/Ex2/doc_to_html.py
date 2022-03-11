@@ -26,7 +26,7 @@ def get_doc(module_name,output_file):
             func_ano=attr.__annotations__
             if func_doc is None:
                 func_doc="There isn't documentation for this function"
-            file.write("\n"+f"Function:{func},documentation: {func_doc}, annotations: {func_ano} ")
+            file.write("\n"+f"Function:{func},documentation: {func_doc}, annotations: {func_ano} "+"\n")
             print(f'Function {func},documentation: {func_doc}, annotations: {func_ano}')
         file.write("</h1>\n \
                        </body></html>")
