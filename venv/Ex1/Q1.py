@@ -1,47 +1,62 @@
-import inspect
 import doctest
-import math
+import inspect
+"""
+Write a function called call_safe, which receives as input another function and arguments with names,
+and calls the function with the arguments, but only they fit exactly to the types defined in the annotation of the function
+"""
 
 
+"""
+Simple functions for tests
+"""
 def f1(x: int):
-    return x ** 2
+    return x * 2
 def f2(x: int, y: float):
     return x - y
 def f3(x: int, y: int, z: int):
     return x + y / z
 
 
-"""
-The function accepts another function with arguments and activates the function 
-only if the arguments are appropriate
-return F result.
-"""
-
 
 def safe_call(func, *args,**kwargs):
     """
     >>> safe_call(f1,4)
-    16
+    8
+    >>> safe_call(f1,0)
+    0
+    >>> safe_call(f1,-2)
+    -4
+    >>> safe_call(f1,8*4-2)
+    60
+    >>> safe_call(f1,"aba")
+    Traceback (most recent call last):
+    Exception: Annotations doesn't match
+    >>> safe_call(f1,"4")
+    Traceback (most recent call last):
+    Exception: Annotations doesn't match
     >>> safe_call(f2,1,3)
-    -1
-    >>> safe_call(f3,1,3,2*2,7)
-    6
-    >>> safe_call(f3,1-3,3,3.5,0)
-    -9.5
-    >>> safe_call(f2,1-3,3,3.5,0)
-    -9.5
-    >>> safe_call(f1,1,"a",3.5,1)
     Traceback (most recent call last):
-    Exception: The argument type doesn't fit the function annotations
-    >>> safe_call(f,1,"fff",3.5,"qq")
+    Exception: Annotations doesn't match
+    >>> safe_call(f3,1,3,8)
+    1.375
+    >>> safe_call(f3,1,8,0)
     Traceback (most recent call last):
-    Exception: The argument type doesn't fit the function annotations
-    >>> safe_call(f,1,"2",3.5,"7")
+    ZeroDivisionError: division by zero
+    >>> safe_call(f3,"1","3",1)
     Traceback (most recent call last):
-    Exception: The argument type doesn't fit the function annotations
-    >>> safe_call(f,'1',2,3.5,7)
+    Exception: Annotations doesn't match
+    >>> safe_call(f1,3*5-2)
+    26
+    >>> safe_call(f1,2**2+47*3)
+    290
+    >>> safe_call(f3,2**2,4+8,5*3)
+    4.8
+    >>> safe_call(f2,"search","algorithms")
     Traceback (most recent call last):
-    Exception: The argument type doesn't fit the function annotations
+    Exception: Annotations doesn't match
+    >>> safe_call(f3,"search","algorithms","course")
+    Traceback (most recent call last):
+    Exception: Annotations doesn't match
     """
     annotations = []
     f_doc = inspect.getfullargspec(func)
