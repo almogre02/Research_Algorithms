@@ -1,92 +1,236 @@
-from functools import lru_cache
+import itertools
+import doctest
+def bounded_subset(S, C):
+    """
+    >>> for i in bounded_subset([1,2,3],4): print(i)
+    []
+    [1]
+    [2]
+    [3]
+    [1, 2]
+    [1, 3]
+    >>> for i in bounded_subset([1,2,3], 1): print(i)
+    []
+    [1]
+    >>> for i in bounded_subset([1,2,3,4,5,6,7,8,9,10], 88): print(i)
+    []
+    [1]
+    [2]
+    [3]
+    [4]
+    [5]
+    [6]
+    [7]
+    [8]
+    [9]
+    [10]
+    [1, 2]
+    [1, 2, 3]
+    [1, 2, 3, 4]
+    [1, 2, 3, 4, 5]
+    [1, 2, 3, 4, 5, 6]
+    [1, 2, 3, 4, 5, 6, 7]
+    [1, 2, 3, 4, 5, 6, 7, 8]
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    >>> for i in bounded_subset([1,11,22,33,44,55,66,77,88,99],500): print(i)
+    []
+    [1]
+    [11]
+    [22]
+    [33]
+    [44]
+    [55]
+    [66]
+    [77]
+    [88]
+    [99]
+    [1, 11]
+    [1, 11, 22]
+    [1, 11, 22, 33]
+    [1, 11, 22, 33, 44]
+    [1, 11, 22, 33, 44, 55]
+    [1, 11, 22, 33, 44, 55, 66]
+    [1, 11, 22, 33, 44, 55, 66, 77]
+    [1, 11, 22, 33, 44, 55, 66, 77, 88]
+    [1, 11, 22, 33, 44, 55, 66, 77, 88, 99]
+    >>> for i in bounded_subset([1,32,4,65,3,45,7,78,6,48],65): print(i)
+    []
+    [1]
+    [3]
+    [4]
+    [6]
+    [7]
+    [32]
+    [45]
+    [48]
+    [65]
+    [1, 3]
+    [1, 3, 4]
+    [1, 3, 4, 6]
+    [1, 3, 4, 6, 7]
+    [1, 3, 4, 6, 7, 32]
+    [1, 3, 4, 6, 32]
+    [1, 3, 4, 6, 45]
+    [1, 3, 4, 7, 32]
+    [1, 3, 4, 7, 45]
+    [1, 3, 4, 32]
+    [1, 3, 4, 45]
+    [1, 3, 6, 7, 32]
+    [1, 3, 6, 7, 45]
+    [1, 3, 6, 32]
+    [1, 3, 6, 45]
+    [1, 3, 7, 32]
+    [1, 3, 7, 45]
+    [1, 3, 32]
+    [1, 3, 45]
+    [1, 4, 6, 7, 32]
+    [1, 4, 6, 7, 45]
+    [1, 4, 6, 32]
+    [1, 4, 6, 45]
+    [1, 4, 7, 32]
+    [1, 4, 7, 45]
+    [1, 4, 32]
+    [1, 4, 45]
+    [1, 6, 7, 32]
+    [1, 6, 7, 45]
+    [1, 6, 32]
+    [1, 6, 45]
+    [1, 7, 32]
+    [1, 7, 45]
+    [1, 32]
+    [1, 45]
+    [3, 4, 6, 7, 32]
+    [3, 4, 6, 7, 45]
+    [3, 4, 6, 32]
+    [3, 4, 6, 45]
+    [3, 4, 7, 32]
+    [3, 4, 7, 45]
+    [3, 4, 32]
+    [3, 4, 45]
+    [3, 6, 7, 32]
+    [3, 6, 7, 45]
+    [3, 6, 32]
+    [3, 6, 45]
+    [3, 7, 32]
+    [3, 7, 45]
+    [3, 32]
+    [3, 45]
+    [4, 6, 7, 32]
+    [4, 6, 7, 45]
+    [4, 6, 32]
+    [4, 6, 45]
+    [4, 7, 32]
+    [4, 7, 45]
+    [4, 32]
+    [4, 45]
+    [6, 7, 32]
+    [6, 7, 45]
+    [6, 32]
+    [6, 45]
+    [7, 32]
+    [7, 45]
+    [1, 3, 4, 6, 48]
+    [1, 3, 4, 7, 48]
+    [1, 3, 4, 48]
+    [1, 3, 6, 7, 48]
+    [1, 3, 6, 48]
+    [1, 3, 7, 48]
+    [1, 3, 48]
+    [1, 4, 6, 7]
+    [1, 4, 6, 48]
+    [1, 4, 7, 48]
+    [1, 4, 48]
+    [1, 6, 7, 48]
+    [1, 6, 48]
+    [1, 7, 48]
+    [1, 48]
+    [3, 4, 6, 7]
+    [3, 4, 6, 48]
+    [3, 4, 7, 48]
+    [3, 4, 48]
+    [3, 6, 7, 48]
+    [3, 6, 48]
+    [3, 7, 48]
+    [3, 48]
+    [4, 6, 7, 48]
+    [4, 6, 48]
+    [4, 7, 48]
+    [4, 48]
+    [6, 7, 48]
+    [6, 48]
+    [7, 48]
+    [1, 3, 4, 7]
+    [1, 3, 6, 7]
+    [1, 3, 6]
+    [1, 3, 7]
+    [1, 4, 6]
+    [1, 4, 7]
+    [1, 4]
+    [1, 6, 7]
+    [1, 6]
+    [1, 7]
+    [3, 4, 6]
+    [3, 4, 7]
+    [3, 4]
+    [3, 6, 7]
+    [3, 6]
+    [3, 7]
+    [4, 6, 7]
+    [4, 6]
+    [4, 7]
+    [6, 7]
+    >>> for i in bounded_subset([100,50,25,12,6,3,1],250): print(i)
+    []
+    [1]
+    [3]
+    [6]
+    [12]
+    [25]
+    [50]
+    [100]
+    [1, 3]
+    [1, 3, 6]
+    [1, 3, 6, 12]
+    [1, 3, 6, 12, 25]
+    [1, 3, 6, 12, 25, 50]
+    [1, 3, 6, 12, 25, 50, 100]
+    """
+    temp_set = []
+    final_sets = []
+    final_sets.append([])
+    S.sort()
+    for i in range(len(S)):
+        if S[i] <= C:
+            temp_set.append(S[i])
+            final_sets.append([S[i]])
+        else:
+            break
+    temp_set.sort()
 
-#@lru_cache()
-'''
-
-class bounded_subsets():
-    def __init__(self, S, C, step = 1):
-        self.step = step
-        self.S = S
-        self.C = C
-        self.ans = []
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return self
-
-    @lru_cache()
-    def limited_sets(self):
-        
-'''
-
-class bounded_subsets():
-    def __init__(self, S, C, step = 1):
-        self.ans = get_subsets(S,C)
-        print(self.ans)
-        i = 5
-
-    def get_subsets(data: list, target: int):
-        # initialize final result which is a list of all subsets summing up to target
-        subsets = []
-        '''for i in range(target):
-            subsets.append(i)'''
-        for i in data:
-            if i <= target:
-                subsets.append(i)
-        # records the difference between the target value and a group of numbers
-        differences = {}
-
-        for number in data:
-            #prospects = []
-
-            # iterate through every record in differences
-            for diff in differences:
-
-                # the number complements a record in differences, i.e. a desired subset is found
-                if number - diff <= 0:
-                    new_subset = [number] + differences[diff]
-                    new_subset.sort()
-                    if new_subset not in subsets:
-                        subsets.append(new_subset)
-
-                # the number fell short to reach the target; add to prospect instead
-                '''elif number - diff < 0:
-                    print("@@@@@@@@@@")
-                    prospects.append((number, diff))'''
-
-            # update the differences record
-            '''for prospect in prospects:
-                print("@@@@@@@@@@")
-                new_diff = target - sum(differences[prospect[1]]) - prospect[0]
-                differences[new_diff] = differences[prospect[1]] + [prospect[0]]'''
-            differences[target - number] = [number]
-
-        for i in range(len(subsets)):
-            yield subsets[i]
-        #for i in subsets:
-         #   yield i
+    for i in range(len(temp_set)):
+        for iter_p in itertools.permutations(temp_set[:i+1]): #permutation in size of 1 -> than 2 -> and...
+            temp_ans = []
+            sum = 0
+            for p in iter_p:
+                sum+=p
+                if sum <= C:
+                    temp_ans.append(p)
+            temp_ans.sort()
+            if temp_ans not in final_sets:
+                final_sets.append(temp_ans)
+    for i in range(len(final_sets)):
+        yield final_sets[i]
 
 
 
 if __name__ == '__main__':
-    list=[1,2,3]
-    for s in bounded_subsets.get_subsets(list,5):
-        print(s, end=', ')
-    list = [1, 2, 3,4,5,6,7,8]
+    for ans in bounded_subset([1, 2, 3], 4):
+        print(ans, end= ',')
     print()
-    for s in bounded_subsets.get_subsets(list,8):
-        print(s, end= ', ')
-    '''
-    ans=get_subsets(list,4)
-    print(next(ans))
-    '''
+    for ans in bounded_subset([6, 1, 2, 5, 3, 1], 8):
+        print(ans, end= ',')
 
-
-
-
-
-
-
-
+    print("\nTests Results:")
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
